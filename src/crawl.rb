@@ -77,7 +77,7 @@ class Cralwer
   def write
     open("../data/#{@genre}.tsv", "w"){|f|
       @anime_casts.each_pair do |title, casts|
-        f.puts title + "¥t" + @anime_date[title] + "¥t" + casts.map{|e|e.join(":")}.join("¥t")
+        f.puts title + "\t" + @anime_date[title] + "\t" + casts.map{|e|e.join(":")}.join("\t")
       end
     }
   end
