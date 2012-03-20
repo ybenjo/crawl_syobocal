@@ -43,6 +43,7 @@ class Cralwer
     rescue Exception => e
       @log.error(e.message)
     end
+    sleep 60
   end
   
   def get_casts(url)
@@ -70,7 +71,7 @@ class Cralwer
     get_titles_and_start_date
     @url_anime.each_key do |url|
       get_casts(url)
-      sleep 10
+      sleep 60
     end
   end
 
