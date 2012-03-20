@@ -57,6 +57,7 @@ class Cralwer
         pair.push (elem/"th").inner_text
         pair.push (elem/"td").inner_text
         @anime_casts[title].push pair
+        @log.info("Get #{title}, #{pair.join(" => ")}")
       end
     rescue Exception => e
       @log.error(e.message)
@@ -76,7 +77,7 @@ class Cralwer
   def write
     open("../data/#{@genre}.tsv", "w"){|f|
       @anime_casts.each_pair do |title, casts|
-        f.puts title + "¥t" + casts.map{|e|e.join(":")}.join("¥t")
+        f.puts title + "¥t" + @anime_date[title] + "¥t" + casts.map{|e|e.join(":")}.join("¥t")
       end
     }
   end

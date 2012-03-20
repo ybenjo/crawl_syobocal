@@ -1,1 +1,15 @@
+* Purpose
 crawl syobocal
+
+* Env
+ruby 1.9.2
+Nokogiri
+
+* Usage
+ruby crawler.rb [playing|old|ova|movie|radio|hero]
+
+* Output
+../data/
+../logs/log_***
+
+
