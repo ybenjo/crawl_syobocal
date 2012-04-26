@@ -23,7 +23,7 @@ class Cralwer
 
     @log = Logger.new("../logs/log_#{@genre}_#{Time.now.strftime("%Y_%m_%d_%H_%M")}")
     @base_url = Genre[@genre]
-    @mongo = Mongo::Connection.new("localhost", 27017).db["animation"]
+    @mongo = Mongo::Connection.new("localhost", 27017).db("animation")
 
     @anime_casts = Hash.new{ |h, k|h[k] = Array.new}
     @anime_date = { }
