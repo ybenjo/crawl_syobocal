@@ -23,7 +23,7 @@ class Cralwer
 
     @log = Logger.new("../logs/log_#{@genre}_#{Time.now.strftime("%Y_%m_%d_%H_%M")}")
     @base_url = Genre[@genre]
-    @mongo = Mongo::Connection.new("localhost", 27017).db("animation")
+    @mongo = Mongo::Connection.new("localhost", 27017).db("animation")[@genre]
 
     @anime_casts = Hash.new{ |h, k|h[k] = Array.new}
     @anime_date = { }
@@ -71,6 +71,13 @@ class Cralwer
         pair.push (elem/"td").inner_text
         @anime_casts[title].push pair
         @log.info("Get #{title}, #{pair.join(" => ")}")
+
+        @mongo.insert({
+                        :title => title,
+                        :date => @anime_date[title],
+                        :last_update => @last_update[title],
+                        :casts => @anime_casts[title]
+                      })
       end
     rescue Exception => e
       @log.error(e.message)
@@ -97,12 +104,12 @@ class Cralwer
 
   def save_db
     @anime_casts.each_pair do |title, casts|
-      @mongo[@genre].insert({
-                              :title => title,
-                              :date => @anime_date[title],
-                              :last_update => @last_update[title],
-                              :casts => casts
-                            })
+      @mongo.insert({
+                      :title => title,
+                      :date => @anime_date[title],
+                      :last_update => @last_update[title],
+                      :casts => casts
+                    })
     end
   end
 end
@@ -110,5 +117,4 @@ end
 if __FILE__ == $0
   d = Cralwer.new(ARGV[0].to_sym)
   d.crawl
-  d.save_db
 end
