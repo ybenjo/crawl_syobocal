@@ -98,7 +98,7 @@ class Cralwer
   def save_db
     @anime_casts.each_pair do |title, casts|
       @mongo[@genre].insert({
-                              :title => titile,
+                              :title => title,
                               :date => @anime_date[title],
                               :last_update => @last_update[title],
                               :casts => casts
