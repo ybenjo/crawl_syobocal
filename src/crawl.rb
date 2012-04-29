@@ -71,14 +71,13 @@ class Cralwer
         pair.push (elem/"td").inner_text
         @anime_casts[title].push pair
         @log.info("Get #{title}, #{pair.join(" => ")}")
-
-        @mongo.insert({
-                        :title => title,
-                        :date => @anime_date[title],
-                        :last_update => @last_update[title],
-                        :casts => @anime_casts[title]
-                      })
       end
+      @mongo.insert({
+                      :title => title,
+                      :date => @anime_date[title],
+                      :last_update => @last_update[title],
+                      :casts => @anime_casts[title]
+                    })
     rescue Exception => e
       @log.error(e.message)
     end
