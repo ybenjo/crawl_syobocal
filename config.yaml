@@ -1,0 +1,7 @@
+# mongo
+address: localhost
+port: 27017
+db: animation
+collection: seiyu
+# crawl interval(sec)
+sleep: 30
