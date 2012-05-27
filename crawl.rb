@@ -26,6 +26,8 @@ class Cralwer
     @sleep = c['sleep']
 
     @genre = genre
+    c['collection'] = @genre if c['collection'] == 'genre'
+
     @base_url = Genre[@genre]
     @mongo = Mongo::Connection.new(c['address'], c['port']).db(c['db'])[c['collection']]
 

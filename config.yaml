@@ -2,6 +2,6 @@
 address: localhost
 port: 27017
 db: animation
-collection: seiyu
+collection: genre
 # crawl interval(sec)
 sleep: 30
