@@ -19,14 +19,13 @@ Genre = {
   hero: "#{Syobocal}/list?cat=4"
 }
 
-class Cralwer
+class Crawler
   def initialize(genre)
     current = File.dirname(File.expand_path(__FILE__))
     c = YAML.load_file("#{current}/config.yaml")
     @sleep = c['sleep']
 
     @genre = genre
-    c['collection'] = @genre if c['collection'] == 'genre'
 
     @base_url = Genre[@genre]
     @mongo = Mongo::Connection.new(c['address'], c['port']).db(c['db'])[c['collection']]
@@ -36,6 +35,9 @@ class Cralwer
     @anime_date = { }
     @anime_title = { }
     @last_update = { }
+    @anime_director = { }
+    @anime_genre = { }
+    @anime_studio = { }
 
     FileUtils.mkdir("#{current}/logs") if !Dir.exist?("#{current}/logs")
     @log = Logger.new("#{current}/logs/log_#{@genre}_#{Time.now.strftime('%Y_%m_%d_%H_%M')}")
@@ -58,6 +60,7 @@ class Cralwer
 
         @anime_date[url] = start_date
         @anime_title[url] = title
+        @anime_genre[url] = @genre
 
         update_time = nil
         begin
@@ -80,6 +83,16 @@ class Cralwer
 
     begin
       @page = Nokogiri::HTML(open(url).read)
+      # 監督とスタジオ
+      (@page/'table.section.staff'/'table.data'/'tr').each do |elem|
+        if (elem/'th').inner_text == '監督'
+          @anime_director[url] = (elem/'td').inner_text
+        elsif (elem/'th').inner_text == 'アニメーション制作'
+          @anime_studio[url] = (elem/'td').inner_text
+        end
+      end
+
+      # 声優
       (@page/'table.section.cast'/'table.data'/'tr').each do |elem|
         pair = [ ]
         pair.push (elem/'th').inner_text
@@ -116,7 +129,10 @@ class Cralwer
       date: @anime_date[url],
       last_update: @last_update[url],
       url: url,
-      casts: @anime_casts[url]
+      casts: @anime_casts[url],
+      director: @anime_director[url],
+      genre: @anime_genre[url],
+      studio: @anime_studio[url]
     }
 
     if _id.nil?
@@ -138,11 +154,11 @@ if __FILE__ == $0
   genre = ARGV[0].to_sym
   if genre == :all
     Genre.each_key do |g|
-      d = Cralwer.new(g)
+      d = Crawler.new(g)
       d.crawl
     end
   else
-    d = Cralwer.new(genre)
+    d = Crawler.new(genre)
     d.crawl
   end
 end

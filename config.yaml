@@ -2,6 +2,6 @@
 address: localhost
 port: 27017
 db: animation
-collection: genre
+collection: syobocal
 # crawl interval(sec)
 sleep: 30
