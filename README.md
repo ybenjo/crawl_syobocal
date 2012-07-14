@@ -19,10 +19,12 @@ ruby crawl.rb [playing|old|ova|movie|radio|hero|all]
 
 ## Output  
 Each mongodb's document contains these values.  
-+ title: Animation's title.   
-+ date: Date when this animations start.    
-+ last\_update: Time when this article(in syobocal) updated.   
-+ url: URL of this animation's article.   
-+ casts: Array of pairs that contains [character, seiyu].   
-
+- title: Animation's title.   
+- date: Date when this animations start.    
+- last\_update: Time when this article(in syobocal) updated.   
+- url: URL of this animation's article.   
+- casts: Array of pairs that contains [character, seiyu].   
+  - Array is sorted by Calender's order(maybe importance).  
+- director: Director who made.    
+- studio: Animation studio which made.   
 
