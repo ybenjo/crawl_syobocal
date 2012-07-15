@@ -118,7 +118,7 @@ class Crawler
         get_casts(url, _id)
         sleep @sleep
       else
-        log.info("Skip. Not updated #{url}.")
+        @log.info("Skip. Not updated #{url}.")
       end
     end
   end
