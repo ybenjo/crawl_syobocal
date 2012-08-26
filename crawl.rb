@@ -146,19 +146,21 @@ class Crawler
 end
 
 if __FILE__ == $0
-  if ARGV[0].nil? || !(Genre.keys + [:all]).include?(ARGV[0].to_sym)
+  if ARGV[0].nil? || !ARGV.all?{|str| (Genre.keys + [:all]).include?(str.to_sym)}
     puts "Usage: ruby crawl.rb [ #{(Genre.keys + [:all]).join(" | ")} ]"
     exit 1
   end
 
-  genre = ARGV[0].to_sym
-  if genre == :all
+  genre = ARGV.map(&:to_sym)
+  if genre == [:all]
     Genre.each_key do |g|
       d = Crawler.new(g)
       d.crawl
     end
   else
-    d = Crawler.new(genre)
-    d.crawl
+    genre.each do |g|
+      d = Crawler.new(g)
+      d.crawl
+    end
   end
 end

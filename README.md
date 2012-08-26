@@ -2,8 +2,8 @@
 Crawl syoboi calendar(cal.syoboi.jp) to collect SEIYU(voice actor/actress)'s information.    
   
 ## Environments  
-+ ruby 1.9.2  
-+ gems: Nokogiri, mongo  
++ ruby >= 1.9  
++ gems: nokogiri, mongo  
 + Mongodb  
 
 ## Usage  
