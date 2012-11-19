@@ -35,9 +35,8 @@ class Crawler
     @anime_date = { }
     @anime_title = { }
     @last_update = { }
-    @anime_director = { }
     @anime_genre = { }
-    @anime_studio = { }
+    @anime_stuff = Hash.new{|h, k|h[k] = Hash.new}
 
     FileUtils.mkdir("#{current}/logs") if !Dir.exist?("#{current}/logs")
     @log = Logger.new("#{current}/logs/log_#{@genre}_#{Time.now.strftime('%Y_%m_%d_%H_%M')}")
@@ -85,11 +84,9 @@ class Crawler
       @page = Nokogiri::HTML(open(url).read)
       # 監督とスタジオ
       (@page/'table.section.staff'/'table.data'/'tr').each do |elem|
-        if (elem/'th').inner_text == '監督'
-          @anime_director[url] = (elem/'td').inner_text
-        elsif (elem/'th').inner_text == 'アニメーション制作'
-          @anime_studio[url] = (elem/'td').inner_text
-        end
+        key = (elem/'th').inner_text
+        val = (elem/'td').inner_text
+        @anime_stuff[url][key] = val
       end
 
       # 声優
@@ -113,7 +110,7 @@ class Crawler
     # ここで last_update はもう取得できている
     @last_update.each_pair do |url, page_last|
       entry = @mongo.find_one({url: url})
-      if entry.nil? || page_last > entry['last_update']
+      if entry.nil? || page_last > entry['last_update'].getlocal('+09:00')
         _id = entry.nil? ? nil : entry['_id']
         get_casts(url, _id)
         sleep @sleep
@@ -130,9 +127,8 @@ class Crawler
       last_update: @last_update[url],
       url: url,
       casts: @anime_casts[url],
-      director: @anime_director[url],
       genre: @anime_genre[url],
-      studio: @anime_studio[url]
+      stuff: @anime_stuff[url]
     }
 
     if _id.nil?
