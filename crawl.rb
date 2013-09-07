@@ -36,7 +36,8 @@ class Crawler
     @anime_title = { }
     @last_update = { }
     @anime_genre = { }
-    @anime_stuff = Hash.new{|h, k|h[k] = Hash.new}
+    @anime_staff = Hash.new{|h, k|h[k] = Hash.new}
+    @subtitles = [ ]
 
     FileUtils.mkdir("#{current}/logs") if !Dir.exist?("#{current}/logs")
     @log = Logger.new("#{current}/logs/log_#{@genre}_#{Time.now.strftime('%Y_%m_%d_%H_%M')}")
@@ -75,6 +76,19 @@ class Crawler
     sleep @sleep
   end
 
+  def get_subtitles(base_url)
+    url = base_url +  '/subtitle'
+    begin
+      page = Nokogiri::HTML(open(url).read)
+      (page/'tbody'/'tr').each do |elem|
+        num, title = (elem/'td').map{|e| e.inner_text}
+        @subtitles.push [num, title]
+      end
+    rescue => e
+      @log.error("in get_subtitles #{url}, #{e.message}")
+    end
+  end
+
   def get_casts(url, _id = nil)
     @log.info("crawl: #{url}")
 
@@ -86,7 +100,7 @@ class Crawler
       (@page/'table.section.staff'/'table.data'/'tr').each do |elem|
         key = (elem/'th').inner_text
         val = (elem/'td').inner_text
-        @anime_stuff[url][key] = val
+        @anime_staff[url][key] = val
       end
 
       # 声優
@@ -97,6 +111,9 @@ class Crawler
         @anime_casts[url].push pair
         @log.info("Get #{title}, #{pair.join(' => ')}")
       end
+
+      get_subtitles(url)
+
       update(url, _id)
     rescue Exception => e
       @log.error(e.message)
@@ -128,7 +145,8 @@ class Crawler
       url: url,
       casts: @anime_casts[url],
       genre: @anime_genre[url],
-      stuff: @anime_stuff[url]
+      staff: @anime_staff[url],
+      subtitles: @subtitles
     }
 
     if _id.nil?
@@ -142,6 +160,8 @@ class Crawler
 end
 
 if __FILE__ == $0
+  # d = Crawler.new(:playing)
+  # d.get_subtitles('http://cal.syoboi.jp/tid/491')
   if ARGV[0].nil? || !ARGV.all?{|str| (Genre.keys + [:all]).include?(str.to_sym)}
     puts "Usage: ruby crawl.rb [ #{(Genre.keys + [:all]).join(" | ")} ]"
     exit 1
