@@ -37,7 +37,7 @@ class Crawler
     @last_update = { }
     @anime_genre = { }
     @anime_staff = Hash.new{|h, k|h[k] = Hash.new}
-    @subtitles = [ ]
+    @subtitles = Hash.new{|h, k|h[k] = Hash.new}
 
     FileUtils.mkdir("#{current}/logs") if !Dir.exist?("#{current}/logs")
     @log = Logger.new("#{current}/logs/log_#{@genre}_#{Time.now.strftime('%Y_%m_%d_%H_%M')}")
@@ -82,7 +82,7 @@ class Crawler
       page = Nokogiri::HTML(open(url).read)
       (page/'tbody'/'tr').each do |elem|
         num, title = (elem/'td').map{|e| e.inner_text}
-        @subtitles.push [num, title]
+        @subtitles[base_url].push [num, title]
       end
     rescue => e
       @log.error("in get_subtitles #{url}, #{e.message}")
@@ -146,7 +146,7 @@ class Crawler
       casts: @anime_casts[url],
       genre: @anime_genre[url],
       staff: @anime_staff[url],
-      subtitles: @subtitles
+      subtitles: @subtitles[url]
     }
 
     if _id.nil?
